@@ -3,6 +3,8 @@ package com.example.mywebsite;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import org.apache.commons.imaging.Imaging;
+
 @SpringBootApplication
 public class MywebsiteApplication {
 
