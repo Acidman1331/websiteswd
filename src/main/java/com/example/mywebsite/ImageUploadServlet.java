@@ -65,60 +65,94 @@ public class ImageUploadServlet extends HttpServlet {
             // Extract metadata
             ImageMetadata metadata = Imaging.getMetadata(filePart.getInputStream(), filePart.getSubmittedFileName());
             Map<String, String> metadataMap = new HashMap<>();
-
-            if (metadata instanceof JpegImageMetadata) {
-                JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
-                TiffImageMetadata tiffImageMetadata = jpegMetadata.getExif();
-
-                if (tiffImageMetadata != null) {
-                    for (TiffField field : tiffImageMetadata.getAllFields()) {
-                        metadataMap.put(field.getTagName(), field.getValue().toString());
-                    }
-                }
-            }
-
-            // Display results
-            response.setContentType("text/html");
             PrintWriter out = response.getWriter();
 
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Image Analysis Results</title>");
-            out.println("<style>");
-            out.println(".container { max-width: 800px; margin: 0 auto; padding: 20px; }");
-            out.println(".image-container { margin: 20px 0; }");
-            out.println(".image-container img { max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 4px; padding: 5px; }");
-            out.println(".metadata-table { width: 100%; border-collapse: collapse; margin-top: 20px; }");
-            out.println(".metadata-table th, .metadata-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }");
-            out.println(".metadata-table th { background-color: #f4f4f4; }");
-            out.println("</style>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<div class='container'>");
-            out.println("<h1>Image Analysis Results</h1>");
+            if (metadata != null) {
+                if (metadata instanceof JpegImageMetadata) {
+                    JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
+                    //TiffImageMetadata tiffImageMetadata = jpegMetadata.getExif();
 
-            out.println("<div class='image-container'>");
-            out.println("<h2>Uploaded Image:</h2>");
-            out.println("<img src='data:" + filePart.getContentType() + ";base64," + base64Image + "' alt='Uploaded image'/>");
-            out.println("</div>");
 
-            out.println("<h2>Image Metadata:</h2>");
-            out.println("<table class='metadata-table'>");
-            out.println("<thead><tr><th>Property</th><th>Value</th></tr></thead>");
-            out.println("<tbody>");
-            for (Map.Entry<String, String> entry : metadataMap.entrySet()) {
-                out.println("<tr><td>" + entry.getKey() + "</td><td>" + entry.getValue() + "</td></tr>");
+                    if (jpegMetadata != null) {
+                        for (TiffField field : jpegMetadata.getExif().getAllFields()) {
+                            metadataMap.put(field.getTagName(), field.getValue().toString());
+                        }
+                    }
+                }
+                metadataMap.put("hard", "codeeee");
+                metadataMap.put("meta", metadata.getClass().toString());
+
+                // Display results
+                response.setContentType("text/html");
+
+                out.println("<!DOCTYPE html>");
+                out.println("<html>");
+                out.println("<head>");
+                out.println("<title>Image Analysis Results</title>");
+                out.println("<style>");
+                out.println(".container { max-width: 800px; margin: 0 auto; padding: 20px; }");
+                out.println(".image-container { margin: 20px 0; }");
+                out.println(".image-container img { max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 4px; padding: 5px; }");
+                out.println(".metadata-table { width: 100%; border-collapse: collapse; margin-top: 20px; }");
+                out.println(".metadata-table th, .metadata-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }");
+                out.println(".metadata-table th { background-color: #f4f4f4; }");
+                out.println("</style>");
+                out.println("</head>");
+                out.println("<body>");
+                out.println("<div class='container'>");
+                out.println("<h1>Image Analysis Results</h1>");
+
+                out.println("<div class='image-container'>");
+                out.println("<h2>Uploaded Image:</h2>");
+                out.println("<img src='data:" + filePart.getContentType() + ";base64," + base64Image + "' alt='Uploaded image'/>");
+                out.println("</div>");
+
+                out.println("<div>");
+                out.println("<div>");
+                out.println("VALOR:" + metadataMap.get("hard"));
+                out.println("</div>");
+
+
+
+                out.println("<h2>Image Metadata:</h2>");
+                out.println("<table class='metadata-table'>");
+                out.println("<thead><tr><th>Property</th><th>Value</th></tr></thead>");
+                out.println("<tbody>");
+                for (Map.Entry<String, String> entry : metadataMap.entrySet()) {
+                    out.println("<tr><td>" + entry.getKey() + "</td><td>" + entry.getValue() + "</td></tr>");
+                }
+                out.println("</tbody></table>");
+
+                out.println("<div style='margin-top: 20px'>");
+                out.println("<a href='upload-image'>Upload Another Image</a>");
+                out.println("</div>");
+
+                out.println("</div>");
+                out.println("</body>");
+                out.println("</html>");
+
+            } else {
+                out.println("No se encontraron metadatos.");
             }
-            out.println("</tbody></table>");
 
-            out.println("<div style='margin-top: 20px'>");
-            out.println("<a href='upload-image'>Upload Another Image</a>");
-            out.println("</div>");
+                // Read metadata from uploaded image
+           // ImageMetadata metadata = Imaging.getMetadata(file.getInputStream(), file.getOriginalFilename());
 
-            out.println("</div>");
-            out.println("</body>");
-            out.println("</html>");
+            //Map<String, String> metadataMap = new HashMap<>();
+
+//            if (metadata instanceof JpegImageMetadata) {
+//                JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
+//                TiffImageMetadata tiffImageMetadata = jpegMetadata.getExif();
+//
+//
+//                if (tiffImageMetadata != null) {
+//                    for (TiffField field : tiffImageMetadata.getAllFields()) {
+//                        metadataMap.put(field.getTagName(), field.getValue().toString());
+//                    }
+//                }
+//            }
+
+
 
         } catch (Exception e) {
             response.getWriter().println("Error processing image: " + e.getMessage());

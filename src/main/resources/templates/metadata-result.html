@@ -42,12 +42,17 @@
         <img th:src="@{'data:' + ${contentType} + ';base64,' + ${imageData}}" alt="Uploaded image"/>
     </div>
 
+    <div style="margin-top: 50px">
+        <p>PEPE</p>
+        <p>${metadata['hard']}></p>
+    </div>
+
     <h2>Image Metadata:</h2>
     <table class="metadata-table">
         <thead>
         <tr>
-            <th>Property</th>
-            <th>Value</th>
+            <th>Propiedad</th>
+            <th>Valor</th>
         </tr>
         </thead>
         <tbody>
@@ -55,8 +60,11 @@
             <td th:text="${entry.key}"></td>
             <td th:text="${entry.value}"></td>
         </tr>
+
         </tbody>
     </table>
+
+
 
     <div style="margin-top: 20px">
         <a href="/upload-image">Upload Another Image</a>

@@ -52,6 +52,7 @@ public class ImageMetadataController {
                     }
                 }
             }
+            metadataMap.put("hard", "code");
 
             model.addAttribute("metadata", metadataMap);
             return "metadata-result";
