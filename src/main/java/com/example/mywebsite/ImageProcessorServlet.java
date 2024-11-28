@@ -1,6 +1,7 @@
 package com.example.mywebsite;
 
 import org.apache.commons.imaging.Imaging;
+import org.apache.commons.imaging.formats.tiff.TiffContents;
 
 
 import javax.servlet.ServletException;
@@ -15,11 +16,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 @WebServlet(name = "ImageProcessor", urlPatterns = "/processImage")
-@MultipartConfig(
-        fileSizeThreshold = 1024 * 1024, // 1MB
-        maxFileSize = 5 * 1024 * 1024,  // 5MB
-        maxRequestSize = 10 * 1024 * 1024 // 10MB
-)
 public class ImageProcessorServlet extends HttpServlet {
 
     @Override
@@ -38,6 +34,7 @@ public class ImageProcessorServlet extends HttpServlet {
         try {
             // Copia el contenido del archivo subido al archivo temporal
             Files.copy(filePart.getInputStream(), tempFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
 
             // Procesa la imagen con commons-imaging
             String metadata = Imaging.getMetadata(tempFile).toString();
