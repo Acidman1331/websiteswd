@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import com.example.mywebsite.service.ImageService;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,7 +51,7 @@ public class ImageMetadataController {
                     }
                 }
             }
-            metadataMap.put("hard", "code");
+            //metadataMap.put("hard", "code");
 
             model.addAttribute("metadata", metadataMap);
             return "metadata-result";

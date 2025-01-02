@@ -12,12 +12,11 @@ import org.apache.commons.imaging.common.ImageMetadata;
 import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
 import org.apache.commons.imaging.formats.tiff.TiffField;
 import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
+import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
+
+import java.io.*;
+import java.util.*;
 
 @WebServlet("/upload-image")
 @MultipartConfig(
@@ -28,7 +27,7 @@ public class ImageUploadServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws  IOException {
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
 
@@ -67,11 +66,159 @@ public class ImageUploadServlet extends HttpServlet {
             Map<String, String> metadataMap = new HashMap<>();
             PrintWriter out = response.getWriter();
 
+            File file = new File("path\\to\\your\\file");
+            try(OutputStream outputStream = new FileOutputStream(file)){
+                IOUtils.copy(filePart.getInputStream(), outputStream);
+            } catch (FileNotFoundException e) {
+                // handle exception here
+            } catch (IOException e) {
+                // handle exception here
+            }
+
+            List<String> imageInfo = new ArrayList<>();
+
+            List<File> files = new List<File>() {
+                @Override
+                public int size() {
+                    return 0;
+                }
+
+                @Override
+                public boolean isEmpty() {
+                    return false;
+                }
+
+                @Override
+                public boolean contains(Object o) {
+                    return false;
+                }
+
+                @Override
+                public Iterator<File> iterator() {
+                    return null;
+                }
+
+                @Override
+                public Object[] toArray() {
+                    return new Object[0];
+                }
+
+                @Override
+                public <T> T[] toArray(T[] a) {
+                    return null;
+                }
+
+                @Override
+                public boolean add(File file) {
+                    return false;
+                }
+
+                @Override
+                public boolean remove(Object o) {
+                    return false;
+                }
+
+                @Override
+                public boolean containsAll(Collection<?> c) {
+                    return false;
+                }
+
+                @Override
+                public boolean addAll(Collection<? extends File> c) {
+                    return false;
+                }
+
+                @Override
+                public boolean addAll(int index, Collection<? extends File> c) {
+                    return false;
+                }
+
+                @Override
+                public boolean removeAll(Collection<?> c) {
+                    return false;
+                }
+
+                @Override
+                public boolean retainAll(Collection<?> c) {
+                    return false;
+                }
+
+                @Override
+                public void clear() {
+
+                }
+
+                @Override
+                public File get(int index) {
+                    return null;
+                }
+
+                @Override
+                public File set(int index, File element) {
+                    return null;
+                }
+
+                @Override
+                public void add(int index, File element) {
+
+                }
+
+                @Override
+                public File remove(int index) {
+                    return null;
+                }
+
+                @Override
+                public int indexOf(Object o) {
+                    return 0;
+                }
+
+                @Override
+                public int lastIndexOf(Object o) {
+                    return 0;
+                }
+
+                @Override
+                public ListIterator<File> listIterator() {
+                    return null;
+                }
+
+                @Override
+                public ListIterator<File> listIterator(int index) {
+                    return null;
+                }
+
+                @Override
+                public List<File> subList(int fromIndex, int toIndex) {
+                    return List.of();
+                }
+            } ;
+
+            files.add((file));
+            //List<BufferedImage> processedImages = Imaging.getBufferedImage(files,2);
+
             if (metadata != null) {
                 if (metadata instanceof JpegImageMetadata) {
                     JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
-                    //TiffImageMetadata tiffImageMetadata = jpegMetadata.getExif();
+                    TiffImageMetadata tiffImageMetadata = jpegMetadata.getExif();
 
+
+                    if (tiffImageMetadata != null) {
+
+                        // Obtener campos TIFF
+                        for (TiffField field : tiffImageMetadata.getAllFields()) {
+                            imageInfo.add(String.format("Field: %s, Type: %s, Value: %s",
+                                    field.getTagName(),
+                                    field.getFieldType().getName(),
+                                    field.getValue()));
+                        }
+                    }
+                    else {
+                            imageInfo.add(String.format("Field: %s, Type: %s, Value: %s",
+                                    "N/D",
+                                    "N/D",
+                                    "N/D"));
+                    }
 
                     if (jpegMetadata != null) {
                         for (TiffField field : jpegMetadata.getExif().getAllFields()) {
@@ -79,8 +226,8 @@ public class ImageUploadServlet extends HttpServlet {
                         }
                     }
                 }
-                metadataMap.put("hard", "codeeee");
-                metadataMap.put("meta", metadata.getClass().toString());
+                //metadataMap.put("hard", "codeeee");
+                //metadataMap.put("meta", metadata.getClass().toString());
 
                 // Display results
                 response.setContentType("text/html");
@@ -99,20 +246,29 @@ public class ImageUploadServlet extends HttpServlet {
                 out.println("</style>");
                 out.println("</head>");
                 out.println("<body>");
+
                 out.println("<div class='container'>");
-                out.println("<h1>Image Analysis Results</h1>");
+                out.println("<h1>Results</h1>");
 
                 out.println("<div class='image-container'>");
                 out.println("<h2>Uploaded Image:</h2>");
                 out.println("<img src='data:" + filePart.getContentType() + ";base64," + base64Image + "' alt='Uploaded image'/>");
                 out.println("</div>");
 
-                out.println("<div>");
-                out.println("<div>");
-                out.println("VALOR:" + metadataMap.get("hard"));
+
+                out.println("<div class=\"result-container\">");
+                out.println("<h2>\"AbstractFieldType\" properties</h2>");
+                out.println("<div class=\"results\">");
+
+                // Generar resultados
+                for (String info : imageInfo) {
+                    out.println("<div class=\"field-info\">" + info + "</div>");
+                }
+
                 out.println("</div>");
+                out.println("</div>"); // Cierre de results
 
-
+                out.println("<hr>");
 
                 out.println("<h2>Image Metadata:</h2>");
                 out.println("<table class='metadata-table'>");
@@ -151,7 +307,6 @@ public class ImageUploadServlet extends HttpServlet {
 //                    }
 //                }
 //            }
-
 
 
         } catch (Exception e) {
